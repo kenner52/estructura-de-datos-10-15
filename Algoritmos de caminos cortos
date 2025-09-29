@@ -1,13 +1,46 @@
 import java.util.*;
 
 public class CaminoCortoBFS {
-    static int V = 6; 
+    static int N = 6; 
+    static ArrayList<Integer>[] grafo = new ArrayList[N];
 
-    
-    static void bfs(List<List<Integer>> graph, int origen, int destino) {
-        boolean[] visitado = new boolean[V];
-        int[] padre = new int[V]; 
-        Arrays.fill(padre, -1);
+    public static void main(String[] args) {
+        for (int i = 0; i < N; i++) {
+            grafo[i] = new ArrayList<>();
+        }
+
+        agregarConexion(0, 1);
+        agregarConexion(0, 2);
+        agregarConexion(1, 3);
+        agregarConexion(2, 3);
+        agregarConexion(3, 4);
+        agregarConexion(4, 5);
+
+        int origen = 0;
+        int destino = 5;
+
+        List<Integer> camino = bfsCamino(origen, destino);
+
+        if (camino.isEmpty()) {
+            System.out.println("No existe camino.");
+        } else {
+            System.out.print("Camino mas corto -> ");
+            for (int i = 0; i < camino.size(); i++) {
+                if (i > 0) System.out.print(" -> ");
+                System.out.print(camino.get(i));
+            }
+        }
+    }
+
+    static void agregarConexion(int u, int v) {
+        grafo[u].add(v);
+        grafo[v].add(u);
+    }
+
+    static List<Integer> bfsCamino(int origen, int destino) {
+        boolean[] visitado = new boolean[N];
+        int[] previo = new int[N];
+        Arrays.fill(previo, -1);
 
         Queue<Integer> cola = new LinkedList<>();
         cola.add(origen);
@@ -15,62 +48,23 @@ public class CaminoCortoBFS {
 
         while (!cola.isEmpty()) {
             int actual = cola.poll();
-
-            if (actual == destino) break; 
-
-            for (int vecino : graph.get(actual)) {
+            if (actual == destino) break;
+            for (int vecino : grafo[actual]) {
                 if (!visitado[vecino]) {
                     visitado[vecino] = true;
-                    padre[vecino] = actual; 
+                    previo[vecino] = actual;
                     cola.add(vecino);
                 }
             }
         }
 
-    
         List<Integer> camino = new ArrayList<>();
-        for (int at = destino; at != -1; at = padre[at]) {
+        if (!visitado[destino]) return camino;
+
+        for (int at = destino; at != -1; at = previo[at]) {
             camino.add(at);
         }
         Collections.reverse(camino);
-
-       
-        System.out.print("Camino más corto → ");
-        for (int i = 0; i < camino.size(); i++) {
-            System.out.print(camino.get(i));
-            if (i < camino.size() - 1) System.out.print(" → ");
-        }
-        System.out.println();
-    }
-
-    public static void main(String[] args) {
-       
-        List<List<Integer>> graph = new ArrayList<>();
-        for (int i = 0; i < V; i++) graph.add(new ArrayList<>());
-
-
-        graph.get(0).add(1);
-        graph.get(1).add(0);
-
-        graph.get(0).add(2);
-        graph.get(2).add(0);
-
-        graph.get(1).add(3);
-        graph.get(3).add(1);
-
-        graph.get(2).add(3);
-        graph.get(3).add(2);
-
-        graph.get(3).add(4);
-        graph.get(4).add(3);
-
-        graph.get(4).add(5);
-        graph.get(5).add(4);
-
-     
-        int origen = 0, destino = 5;
-
-      
-        bfs(graph, origen, destino);
+        return camino;
     }
 }
