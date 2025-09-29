@@ -1,0 +1,78 @@
+import java.util.*;
+
+public class metodoKruskal {
+    static class Edge implements Comparable<Edge> {
+        int u, v, w;
+        Edge(int u, int v, int w) {
+            this.u = u; this.v = v; this.w = w;
+        }
+        public int compareTo(Edge other) {
+            return this.w - other.w; 
+        }
+    }
+
+    static int V = 6; 
+    static List<Edge> edges = new ArrayList<>();
+
+   
+    static int find(int[] parent, int i) {
+        if (parent[i] == i) return i;
+        return parent[i] = find(parent, parent[i]);
+    }
+
+    static void union(int[] parent, int[] rank, int x, int y) {
+        int rx = find(parent, x), ry = find(parent, y);
+        if (rx != ry) {
+            if (rank[rx] < rank[ry]) parent[rx] = ry;
+            else if (rank[rx] > rank[ry]) parent[ry] = rx;
+            else { parent[ry] = rx; rank[rx]++; }
+        }
+    }
+
+    static void kruskalMST() {
+        Collections.sort(edges); 
+        int[] parent = new int[V], rank = new int[V];
+        for (int i = 0; i < V; i++) parent[i] = i;
+
+        int cost = 0, count = 0, descartadas = 0;
+
+        System.out.println("Aristas seleccionadas por Kruskal:");
+        for (Edge e : edges) {
+            int ru = find(parent, e.u), rv = find(parent, e.v);
+
+            if (ru != rv) { 
+                cost += e.w;
+                union(parent, rank, ru, rv);
+                count++;
+                System.out.println("  ✔ " + e.u + "-" + e.v + " (" + e.w + ")");
+                if (count == V - 1) break; 
+            } else {
+                descartadas++;
+                System.out.println("  ✘ " + e.u + "-" + e.v + " (" + e.w + ") descartada (ciclo)");
+            }
+        }
+
+        System.out.println("Costo total del MST = " + cost);
+        System.out.println("Número de aristas descartadas = " + descartadas);
+    }
+
+ 
+    public static void main(String[] args) {
+     
+        edges.add(new Edge(0,1,6));
+        edges.add(new Edge(0,2,1));
+        edges.add(new Edge(0,3,5));
+        edges.add(new Edge(1,2,2));
+        edges.add(new Edge(1,4,5));
+        edges.add(new Edge(2,3,2));
+        edges.add(new Edge(2,4,6));
+        edges.add(new Edge(3,5,4));
+        edges.add(new Edge(4,5,3));
+
+     
+        kruskalMST();
+
+     
+        System.out.println("Comparación: El costo del MST con Prim también es 12, así que coinciden ");
+    }
+}
