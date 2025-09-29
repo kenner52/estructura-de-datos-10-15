@@ -1,0 +1,70 @@
+package estructura.de.datos.ii;
+
+import java.util.*;
+
+public class metodoprim {
+    static class Edge implements Comparable<Edge> {
+        int u, v, w;
+        Edge(int u, int v, int w) {
+            this.u = u; this.v = v; this.w = w;
+        }
+        @Override
+        public int compareTo(Edge other) {
+            return this.w - other.w; 
+        }
+    }
+
+    static int V = 6; 
+
+    static int prim(List<List<Edge>> graph, int start) {
+        boolean[] visited = new boolean[V];
+        PriorityQueue<Edge> pq = new PriorityQueue<>();
+        visited[start] = true;
+        pq.addAll(graph.get(start));
+
+        int cost = 0, count = 1;
+        System.out.println("\nIniciando Prim desde vértice " + start + ":");
+
+        while (!pq.isEmpty() && count < V) {
+            Edge e = pq.poll();
+            if (visited[e.v]) continue;
+
+            visited[e.v] = true;
+            cost += e.w;
+            count++;
+            System.out.println("Tomo arista " + e.u + "-" + e.v + " (" + e.w + ")");
+
+            for (Edge next : graph.get(e.v)) {
+                if (!visited[next.v]) pq.add(next);
+            }
+        }
+
+        System.out.println("Costo total del MST = " + cost);
+        return cost;
+    }
+
+    public static void main(String[] args) {
+
+        int[][] edges = {
+            {0,1,6}, {0,2,1}, {0,3,5},
+            {1,2,2}, {1,4,5},
+            {2,3,2}, {2,4,6},
+            {3,5,4},
+            {4,5,3}
+        };
+
+
+        List<List<Edge>> graph = new ArrayList<>();
+        for (int i = 0; i < V; i++) graph.add(new ArrayList<>());
+        for (int[] e : edges) {
+            graph.get(e[0]).add(new Edge(e[0], e[1], e[2]));
+            graph.get(e[1]).add(new Edge(e[1], e[0], e[2]));
+        }
+
+  
+        prim(graph, 0);
+
+  
+        prim(graph, 2);
+    }
+}
