@@ -1,0 +1,87 @@
+import java.util.*;
+
+public class Dijkstra {
+    static class Edge {
+        int destino, peso;
+        Edge(int d, int p) {
+            destino = d;
+            peso = p;
+        }
+    }
+
+    static class Nodo implements Comparable<Nodo> {
+        int vertice, dist;
+        Nodo(int v, int d) {
+            vertice = v;
+            dist = d;
+        }
+        public int compareTo(Nodo otro) {
+            return this.dist - otro.dist;
+        }
+    }
+
+    static int V = 5;
+
+    static void dijkstra(List<List<Edge>> grafo, int origen) {
+        int[] dist = new int[V];
+        int[] padre = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        Arrays.fill(padre, -1);
+
+        dist[origen] = 0;
+        PriorityQueue<Nodo> pq = new PriorityQueue<>();
+        pq.add(new Nodo(origen, 0));
+
+        while (!pq.isEmpty()) {
+            Nodo actual = pq.poll();
+            int u = actual.vertice;
+
+            for (Edge e : grafo.get(u)) {
+                int v = e.destino;
+                int nuevoDist = dist[u] + e.peso;
+
+                if (nuevoDist < dist[v]) {
+                    dist[v] = nuevoDist;
+                    padre[v] = u;
+                    pq.add(new Nodo(v, dist[v]));
+                }
+            }
+        }
+
+        System.out.println("Distancias mínimas desde el vértice " + origen + ":");
+        for (int i = 0; i < V; i++) {
+            System.out.print("  A " + i + " = " + dist[i] + " | Camino: ");
+            imprimirCamino(padre, i);
+            System.out.println();
+        }
+    }
+
+    static void imprimirCamino(int[] padre, int destino) {
+        List<Integer> camino = new ArrayList<>();
+        for (int at = destino; at != -1; at = padre[at]) {
+            camino.add(at);
+        }
+        Collections.reverse(camino);
+        for (int i = 0; i < camino.size(); i++) {
+            System.out.print(camino.get(i));
+            if (i < camino.size() - 1) System.out.print(" → ");
+        }
+    }
+
+    public static void main(String[] args) {
+        List<List<Edge>> grafo = new ArrayList<>();
+        for (int i = 0; i < V; i++) grafo.add(new ArrayList<>());
+
+        grafo.get(0).add(new Edge(1, 10));
+        grafo.get(0).add(new Edge(4, 3));
+        grafo.get(1).add(new Edge(2, 2));
+        grafo.get(1).add(new Edge(4, 4));
+        grafo.get(2).add(new Edge(3, 9));
+        grafo.get(3).add(new Edge(2, 7));
+        grafo.get(4).add(new Edge(1, 1));
+        grafo.get(4).add(new Edge(2, 8));
+        grafo.get(4).add(new Edge(3, 2));
+
+        dijkstra(grafo, 0);
+    }
+}
