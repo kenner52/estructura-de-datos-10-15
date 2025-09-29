@@ -1,0 +1,115 @@
+import java.util.*;
+
+public class sistemascomputacionales {
+    static int N = 6;
+    static ArrayList<Integer>[] grafo = new ArrayList[N];
+
+    public static void main(String[] args) {
+        for (int i = 0; i < N; i++) {
+            grafo[i] = new ArrayList<>();
+        }
+
+        // Algunas conexiones iniciales
+        agregarConexion(0, 1);
+        agregarConexion(0, 2);
+        agregarConexion(1, 3);
+        agregarConexion(2, 4);
+        agregarConexion(4, 5);
+
+        Scanner sc = new Scanner(System.in);
+        System.out.println("1. Agregar conexion");
+        System.out.println("2. Ver si hay comunicacion");
+        System.out.println("3. Camino mas corto");
+        int opcion = sc.nextInt();
+
+        if (opcion == 1) {
+            System.out.print("Nodo origen: ");
+            int u = sc.nextInt();
+            System.out.print("Nodo destino: ");
+            int v = sc.nextInt();
+            agregarConexion(u, v);
+            System.out.println("Conexion agregada.");
+        }
+
+        if (opcion == 2) {
+            System.out.print("Nodo origen: ");
+            int u = sc.nextInt();
+            System.out.print("Nodo destino: ");
+            int v = sc.nextInt();
+            if (hayComunicacion(u, v)) {
+                System.out.println("SI hay comunicacion.");
+            } else {
+                System.out.println("NO hay comunicacion.");
+            }
+        }
+
+        if (opcion == 3) {
+            System.out.print("Nodo origen: ");
+            int u = sc.nextInt();
+            System.out.print("Nodo destino: ");
+            int v = sc.nextInt();
+            List<Integer> camino = caminoMasCorto(u, v);
+            if (camino.isEmpty()) {
+                System.out.println("No hay camino.");
+            } else {
+                System.out.println("Camino mas corto: " + camino);
+                System.out.println("Saltos: " + (camino.size() - 1));
+            }
+        }
+    }
+
+    static void agregarConexion(int u, int v) {
+        grafo[u].add(v);
+        grafo[v].add(u);
+    }
+
+    static boolean hayComunicacion(int u, int v) {
+        boolean[] visitado = new boolean[N];
+        Queue<Integer> cola = new LinkedList<>();
+        cola.add(u);
+        visitado[u] = true;
+
+        while (!cola.isEmpty()) {
+            int actual = cola.poll();
+            if (actual == v) return true;
+            for (int vecino : grafo[actual]) {
+                if (!visitado[vecino]) {
+                    visitado[vecino] = true;
+                    cola.add(vecino);
+                }
+            }
+        }
+        return false;
+    }
+
+    static List<Integer> caminoMasCorto(int u, int v) {
+        boolean[] visitado = new boolean[N];
+        int[] previo = new int[N];
+        Arrays.fill(previo, -1);
+
+        Queue<Integer> cola = new LinkedList<>();
+        cola.add(u);
+        visitado[u] = true;
+
+        while (!cola.isEmpty()) {
+            int actual = cola.poll();
+            if (actual == v) break;
+            for (int vecino : grafo[actual]) {
+                if (!visitado[vecino]) {
+                    visitado[vecino] = true;
+                    previo[vecino] = actual;
+                    cola.add(vecino);
+                }
+            }
+        }
+
+        List<Integer> camino = new ArrayList<>();
+        if (!visitado[v]) return camino;
+
+        for (int at = v; at != -1; at = previo[at]) {
+            camino.add(at);
+        }
+        Collections.reverse(camino);
+        return camino;
+    }
+}
